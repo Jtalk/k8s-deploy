@@ -2,9 +2,7 @@
 
 This action can be used to deploy manifests to Kubernetes clusters.
 
-This action requires that the cluster context be set earlier in the workflow by using either the [Azure/aks-set-context](https://github.com/Azure/aks-set-context/tree/releases/v1) action or the [Azure/k8s-set-context](https://github.com/Azure/k8s-set-context/tree/releases/v1) action.
-
-If you are looking to automate your workflows to deploy to [Azure Web Apps](https://azure.microsoft.com/en-us/services/app-service/web/) and [Azure Web App for Containers](https://azure.microsoft.com/en-us/services/app-service/containers/), consider using [`Azure/webapps-deploy`](https://github.com/Azure/webapps-deploy) action.
+This action requires that the cluster context be set in the appropriate KUBECONFIG file. 
 
 ## Action capabilities
 
@@ -14,7 +12,7 @@ Following are the key capabilities of this action:
 
 - **Object stability checks**: Rollout status is checked for the Kubernetes objects deployed. This is done to incorporate stability checks while computing the action status as success/failure.
 
-- **Secret handling**: The secret names specified as inputs in the action are used to augment the input manifest files with imagePullSecrets values before deploying to the cluster. Also, checkout the [Azure/k8s-create-secret](https://github.com/Azure/k8s-create-secret) action for creation of generic or docker-registry secrets in the cluster.
+- **Secret handling**: The secret names specified as inputs in the action are used to augment the input manifest files with imagePullSecrets values before deploying to the cluster.
 
 - **Deployment strategy** Choosing canary strategy with this action leads to creation of workloads suffixed with '-baseline' and '-canary'. There are two methods of traffic splitting supported in the action:
     - **Service Mesh Interface**: Service Mesh Interface abstraction allows for plug-and-play configuration with service mesh providers such as Linkerd and Istio. Meanwhile, this action takes away the hard work of mapping SMI's TrafficSplit objects to the stable, baseline and canary services during the lifecycle of the deployment strategy. Service mesh based canary deployments using this action are more accurate as service mesh providers enable granular percentage traffic split (via service registry and sidecar containers injected into pods alongside application containers).
@@ -41,7 +39,7 @@ Following are the key capabilities of this action:
   </tr>
   <tr>
     <td><code>images</code><br/>Images</td>
-    <td>(Optional) Fully qualified resource URL of the image(s) to be used for substitutions on the manifest files. This multiline input accepts specifying multiple artifact substitutions in newline separated form. For example - <br>images: |<br>&nbsp&nbspcontosodemo.azurecr.io/foo:test1<br>&nbsp&nbspcontosodemo.azurecr.io/bar:test2<br>In this example, all references to contosodemo.azurecr.io/foo and contosodemo.azurecr.io/bar are searched for in the image field of the input manifest files. For the matches found, the tags test1 and test2 are substituted.</td>
+    <td>(Optional) Fully qualified resource URL of the image(s) to be used for substitutions on the manifest files. This multiline input accepts specifying multiple artifact substitutions in newline separated form. For example - <br>images: |<br>&nbsp&nbsprepo/foo:test1<br>&nbsp&nbsprepo/bar:test2<br>In this example, all references to repo/foo and repo/bar are searched for in the image field of the input manifest files. For the matches found, the tags test1 and test2 are substituted.</td>
   </tr>
   <tr>
     <td><code>imagepullsecrets</code><br/>Image pull secrets</td>
@@ -78,13 +76,13 @@ Following are the key capabilities of this action:
 ### Basic deployment (without any deployment strategy)
 
 ```yaml
-- uses: Azure/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v1
   with:
     namespace: 'myapp'
     manifests: |
         deployment.yaml
         service.yaml
-    images: 'contoso.azurecr.io/myapp:${{ event.run_id }}'
+    images: 'jtalk/myapp:${{ event.run_id }}'
     imagepullsecrets: |
       image-pull-secret1
       image-pull-secret2
@@ -94,10 +92,10 @@ Following are the key capabilities of this action:
 ### Deployment Strategies - Canary deployment without service mesh
 
 ```yaml
-- uses: Azure/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v1
   with:
     namespace: 'myapp'
-    images: 'contoso.azurecr.io/myapp:${{ event.run_id }}'
+    images: 'jtalk/myapp:${{ event.run_id }}'
     imagepullsecrets: |
       image-pull-secret1
       image-pull-secret2
@@ -111,10 +109,10 @@ Following are the key capabilities of this action:
 To promote/reject the canary created by the above snippet, the following YAML snippet could be used:
 
 ```yaml
-- uses: Azure/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v1
   with:
     namespace: 'myapp'
-    images: 'contoso.azurecr.io/myapp:${{ event.run_id }}'
+    images: 'jtalk/myapp:${{ event.run_id }}'
     imagepullsecrets: |
       image-pull-secret1
       image-pull-secret2
@@ -128,10 +126,10 @@ To promote/reject the canary created by the above snippet, the following YAML sn
 ### Deployment Strategies - Canary deployment based on Service Mesh Interface
 
 ```yaml
-- uses: Azure/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v1
   with:
     namespace: 'myapp'
-    images: 'contoso.azurecr.io/myapp:${{ event.run_id }}'
+    images: 'jtalk/myapp:${{ event.run_id }}'
     imagepullsecrets: |
       image-pull-secret1
       image-pull-secret2
@@ -147,10 +145,10 @@ To promote/reject the canary created by the above snippet, the following YAML sn
 To promote/reject the canary created by the above snippet, the following YAML snippet could be used:
 
 ```yaml
-- uses: Azure/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v1
   with:
     namespace: 'myapp'
-    images: 'contoso.azurecr.io/myapp:${{ event.run_id }} '
+    images: 'jtalk/myapp:${{ event.run_id }} '
     imagepullsecrets: |
       image-pull-secret1
       image-pull-secret2
@@ -161,110 +159,3 @@ To promote/reject the canary created by the above snippet, the following YAML sn
     traffic-split-method: smi
     action: reject # substitute reject if you want to reject
 ```
-
-## End to end workflows
-
-Following are a few examples of not just this action, but how this action could be used along with other container and k8s related actions for building images and deploying objects onto k8s clusters:
-
-### Build container image and deploy to Azure Kubernetes Service cluster
-
-```yaml
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    
-    - uses: Azure/docker-login@v1
-      with:
-        login-server: contoso.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-    - run: |
-        docker build . -t contoso.azurecr.io/k8sdemo:${{ github.sha }}
-        docker push contoso.azurecr.io/k8sdemo:${{ github.sha }}
-      
-    # Set the target AKS cluster.
-    - uses: Azure/aks-set-context@v1
-      with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: contoso
-        resource-group: contoso-rg
-        
-    - uses: Azure/k8s-create-secret@v1
-      with:
-        container-registry-url: contoso.azurecr.io
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: demo-k8s-secret
-
-    - uses: Azure/k8s-deploy@v1
-      with:
-        manifests: |
-          manifests/deployment.yml
-          manifests/service.yml
-        images: |
-          demo.azurecr.io/k8sdemo:${{ github.sha }}
-        imagepullsecrets: |
-          demo-k8s-secret
-```
-
-### Build container image and deploy to any Azure Kubernetes Service cluster
-
-```yaml
-on: [push]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    
-    - uses: Azure/docker-login@v1
-      with:
-        login-server: contoso.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-    - run: |
-        docker build . -t contoso.azurecr.io/k8sdemo:${{ github.sha }}
-        docker push contoso.azurecr.io/k8sdemo:${{ github.sha }}
-      
-    - uses: Azure/k8s-set-context@v1
-      with:
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
-        
-    - uses: Azure/k8s-create-secret@v1
-      with:
-        container-registry-url: contoso.azurecr.io
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: demo-k8s-secret
-
-    - uses: Azure/k8s-deploy@v1
-      with:
-        manifests: |
-          manifests/deployment.yml
-          manifests/service.yml
-        images: |
-          demo.azurecr.io/k8sdemo:${{ github.sha }}
-        imagepullsecrets: |
-          demo-k8s-secret
-```
-
-# Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
