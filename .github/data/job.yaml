@@ -8,7 +8,7 @@ spec:
       containers:
       - name: test-job
         image: alpine:[[VERSION]]
-        command: sh
+        command: [sh]
         args:
         - -c
         - echo
