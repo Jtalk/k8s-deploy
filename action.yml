@@ -1,5 +1,5 @@
-name: 'Deploy to Kubernetes cluster'
-description: "Deploy to Kubernetes cluster. A repaired & demicro$ofted version of Azure's"
+name: 'Simple deploy to Kubernetes cluster'
+description: "Deploy to Kubernetes cluster with optional image version substitution. A repaired & demicro$ofted version of Azure's"
 inputs: 
 # Please ensure you have had KUBECONFIG set earlier in your workflow 
   namespace:
@@ -44,6 +44,7 @@ inputs:
 
 branding:
   color: 'purple'
+  icon: 'arrow-right'
 runs:
   using: 'node12'
   main: 'dist/index.js'
