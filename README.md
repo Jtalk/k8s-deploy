@@ -2,7 +2,18 @@
 
 This action can be used to deploy manifests to Kubernetes clusters.
 
-This action requires that the cluster context be set in the appropriate KUBECONFIG file. 
+This is a fixed & demicro$ofted version of the Azure's original attempt at writing a k8s deployment action. 
+
+This action requires that the cluster context be set in the appropriate KUBECONFIG file, options include:
+* If using a cli-based k8s provider offering generate a kubeconfig for you (DigitalOcean, EKS), all you need to do is to create an environment variable KUBECONFIG pointing at that file.
+* If using a pre-generated kubeconfig from Github's Secrets, consider using [this](https://github.com/Azure/k8s-set-context) to set it for you.
+
+## Difference from the upstream action
+
+* This version doesn't use a JSON/Yaml parser for substitutions, unlike upstream's v1, the only available tag at the moment of writing. Practically, it means your special values (esp. booleans) are not getting broken by it.
+* This version no longer produces a misleading warning upon discovering a missing KUBECONFIG variable.
+* This version has a strict micro$oft-free policy. Useful for people having been born just in time to witness 1990x and early 2000x. 
+* You don't need to sign any EULA to use/contribute.
 
 ## Action capabilities
 
