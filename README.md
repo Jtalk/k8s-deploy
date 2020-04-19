@@ -87,7 +87,7 @@ Following are the key capabilities of this action:
 ### Basic deployment (without any deployment strategy)
 
 ```yaml
-- uses: jtalk/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v2
   with:
     namespace: 'myapp'
     manifests: |
@@ -103,7 +103,7 @@ Following are the key capabilities of this action:
 ### Deployment Strategies - Canary deployment without service mesh
 
 ```yaml
-- uses: jtalk/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v2
   with:
     namespace: 'myapp'
     images: 'jtalk/myapp:${{ event.run_id }}'
@@ -120,7 +120,7 @@ Following are the key capabilities of this action:
 To promote/reject the canary created by the above snippet, the following YAML snippet could be used:
 
 ```yaml
-- uses: jtalk/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v2
   with:
     namespace: 'myapp'
     images: 'jtalk/myapp:${{ event.run_id }}'
@@ -137,7 +137,7 @@ To promote/reject the canary created by the above snippet, the following YAML sn
 ### Deployment Strategies - Canary deployment based on Service Mesh Interface
 
 ```yaml
-- uses: jtalk/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v2
   with:
     namespace: 'myapp'
     images: 'jtalk/myapp:${{ event.run_id }}'
@@ -156,7 +156,7 @@ To promote/reject the canary created by the above snippet, the following YAML sn
 To promote/reject the canary created by the above snippet, the following YAML snippet could be used:
 
 ```yaml
-- uses: jtalk/k8s-deploy@v1
+- uses: jtalk/k8s-deploy@v2
   with:
     namespace: 'myapp'
     images: 'jtalk/myapp:${{ event.run_id }} '
