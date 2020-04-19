@@ -27,5 +27,5 @@ jobs:
           alpine:3.10
     - name: Print the deployed descriptors
       run: |
-        kubectl -n test-ns get job test-job -o yaml
-        kubectl -n test-ns get cronjob test-job -o yaml
+        kubectl -n test-ns get -f .github/data/job.yaml -o yaml
+        kubectl -n test-ns get -f .github/data/cronjob.yml -o yaml
