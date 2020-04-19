@@ -1,0 +1,25 @@
+name: Check action
+on: [push]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Minikube
+      id: minikube
+      uses: CodingNagger/minikube-setup-action@v1.0.3
+    - name: Launch Minikube
+      run: eval ${{ steps.minikube.outputs.launcher }}
+    - name: Create a custom namespace
+      run: kubectl create namespace test-ns
+    - name: Run the deploy action
+      uses: ./
+      with:
+        namespace: test-ns
+        manifests: |
+          .github/data/job.yaml
+          .github/data/cronjob.yml
+        images: |
+          busybox:glibc
+          alpine:3.10
