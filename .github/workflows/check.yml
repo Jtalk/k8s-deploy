@@ -4,6 +4,8 @@ on: [push]
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: ~/.kube/config
     steps:
     - uses: actions/checkout@v2
     - name: Setup Minikube
