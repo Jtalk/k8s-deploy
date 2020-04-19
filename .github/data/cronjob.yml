@@ -1,0 +1,17 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: test-cron-job
+spec:
+  schedule: "0 1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: test-cron-job
+            image: busybox:[[VERSION]]
+            args:
+            - echo
+            - success
+          restartPolicy: Never
