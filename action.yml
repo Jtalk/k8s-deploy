@@ -1,7 +1,7 @@
 name: 'Deploy to Kubernetes cluster'
 description: 'Deploy to Kubernetes cluster'
 inputs: 
-# Please ensure you have used either azure/k8s-actions/aks-set-context or azure/k8s-actions/k8s-set-context in the workflow before this action
+# Please ensure you have had KUBECONFIG set earlier in your workflow 
   namespace:
     description: 'Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.'
     required: false
@@ -43,7 +43,7 @@ inputs:
     default: 'deploy'
 
 branding:
-  color: 'green' # optional, decorates the entry in the GitHub Marketplace
+  color: 'purple'
 runs:
   using: 'node12'
   main: 'dist/index.js'
