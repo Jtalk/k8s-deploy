@@ -4,7 +4,9 @@
     "author": "Deepak Sattiraju",
     "license": "MIT",
     "scripts": {
-        "build": "tsc --outDir ./lib --rootDir ./src"
+        "build-ts": "tsc --outDir ./lib --rootDir ./src",
+        "build-ncc": "ncc build lib/run.js -o dist",
+        "build": "npm run build-ts && npm run build-ncc"
     },
     "dependencies": {
         "@actions/tool-cache": "^1.0.0",
