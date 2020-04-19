@@ -25,3 +25,7 @@ jobs:
         images: |
           busybox:glibc
           alpine:3.10
+    - name: Print the deployed descriptors
+      run: |
+        kubectl -n test-ns get job test-job -o yaml
+        kubectl -n test-ns get cronjob test-job -o yaml
