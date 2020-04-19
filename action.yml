@@ -1,5 +1,5 @@
 name: 'Deploy to Kubernetes cluster'
-description: 'Deploy to Kubernetes cluster'
+description: "Deploy to Kubernetes cluster. A repaired & demicro$ofted version of Azure's"
 inputs: 
 # Please ensure you have had KUBECONFIG set earlier in your workflow 
   namespace:
