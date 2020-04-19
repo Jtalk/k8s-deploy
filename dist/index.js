@@ -5351,7 +5351,8 @@ function installKubectl(version) {
 }
 function checkClusterContext() {
     if (!process.env["KUBECONFIG"]) {
-        throw new Error('Cluster context not set. Use k8ssetcontext action to set cluster context');
+        throw new Error('KUBECONFIG is not set. You can create an environment variable of that name pointing at the kube config created by an early step, '
+            + 'or use k8s-set-context action to create one from a Github secret');
     }
 }
 function run() {
